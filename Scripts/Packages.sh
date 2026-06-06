@@ -77,6 +77,8 @@ UPDATE_PACKAGE "aurora-config" "eamonxg/luci-app-aurora-config" "master"
 UPDATE_PACKAGE "viking" "VIKINGYFY/packages" "main" "" "luci-app-wolplus"
 #UPDATE_PACKAGE "vnt" "lmq8267/luci-app-vnt" "main"
 UPDATE_PACKAGE "lucky" "gdy666/luci-app-lucky" "main"
+#UPDATE_PACKAGE "luci-app-daede" "kenzok8/openwrt-daede" "main" "" "luci-app-daede"
+
 
 #更新软件包版本
 UPDATE_VERSION() {
@@ -121,6 +123,30 @@ UPDATE_VERSION() {
 
 #UPDATE_VERSION "软件包名" "测试版，true，可选，默认为否"
 #UPDATE_VERSION "sing-box"
+#UPDATE_VERSION "dae"
+#UPDATE_VERSION "daed"
+
+#==================== 替换 dae/daed 为第三方版本 ====================
+echo "替换 dae/daed 为 QiuSimons 的 Kix 分支..."
+
+# 1. 精确删除官方 feeds 中的四个目标目录（不会误删其他包）
+rm -rf ../feeds/luci/applications/luci-app-dae
+rm -rf ../feeds/luci/applications/luci-app-daed
+rm -rf ../feeds/packages/net/dae
+rm -rf ../feeds/packages/net/daed
+
+# 2. 克隆 luci-app-dae 仓库并复制 dae 和 luci-app-dae
+git clone https://github.com/QiuSimons/luci-app-dae package/dae
+
+# 3. 克隆 luci-app-daed 仓库并复制 daed 和 luci-app-daed
+git clone https://github.com/QiuSimons/luci-app-daed package/daed
+
+echo "第三方 dae/daed 包替换完成。"
+
+echo ">> 集成 luci-app-daede..."
+git clone --depth=1 --single-branch --branch main https://github.com/kenzok8/openwrt-daede.git tmp-daede
+cp -rf tmp-daede/luci-app-daede package/
+rm -rf tmp-daede
 
 #引入私有扩展脚本
 if [ -f "$GITHUB_WORKSPACE/Scripts/PRIVATE.sh" ]; then
