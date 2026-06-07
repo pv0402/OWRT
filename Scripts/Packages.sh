@@ -77,7 +77,11 @@ UPDATE_PACKAGE "aurora-config" "eamonxg/luci-app-aurora-config" "master"
 UPDATE_PACKAGE "viking" "VIKINGYFY/packages" "main" "" "luci-app-wolplus"
 #UPDATE_PACKAGE "vnt" "lmq8267/luci-app-vnt" "main"
 UPDATE_PACKAGE "lucky" "gdy666/luci-app-lucky" "main"
-UPDATE_PACKAGE "luci-app-daede" "kenzok8/luci-app-daede" "main" "" "luci-app-daede"
+#UPDATE_PACKAGE "luci-app-daede" "kenzok8/luci-app-daede" "main" "" "luci-app-daede"
+UPDATE_PACKAGE "dae" "QiuSimons/luci-app-dae" "kix" 
+UPDATE_PACKAGE "daed" "QiuSimons/luci-app-daed" "kix"
+UPDATE_PACKAGE "vmlinux-btf" "QiuSimons/vmlinux-btf" "master"
+
 
 #更新软件包版本
 UPDATE_VERSION() {
@@ -122,8 +126,8 @@ UPDATE_VERSION() {
 
 #UPDATE_VERSION "软件包名" "测试版，true，可选，默认为否"
 #UPDATE_VERSION "sing-box"
-UPDATE_VERSION "dae"
-UPDATE_VERSION "daed"
+#UPDATE_VERSION "dae"
+#UPDATE_VERSION "daed"
 
 #引入私有扩展脚本
 if [ -f "$GITHUB_WORKSPACE/Scripts/PRIVATE.sh" ]; then
