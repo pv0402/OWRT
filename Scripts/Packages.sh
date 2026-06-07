@@ -140,7 +140,7 @@ rm -rf ../feeds/packages/net/daed
 git clone https://github.com/QiuSimons/luci-app-dae package/dae
 
 # 3. 克隆 luci-app-daed 仓库并复制 daed 和 luci-app-daed
-#git clone https://github.com/QiuSimons/luci-app-daed package/dae
+git clone https://github.com/QiuSimons/luci-app-daed package/dae
 
 echo "第三方 dae/daed 包替换完成。"
 
