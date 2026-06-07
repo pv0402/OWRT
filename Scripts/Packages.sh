@@ -137,16 +137,10 @@ rm -rf ../feeds/packages/net/dae
 rm -rf ../feeds/packages/net/daed
 
 # 2. 克隆 luci-app-dae 仓库并复制 dae 和 luci-app-dae
-git clone --depth=1 --single-branch --branch kix https://github.com/QiuSimons/luci-app-dae.git
-cp -rf luci-app-dae/dae ./
-cp -rf luci-app-dae/luci-app-dae ./
-rm -rf luci-app-dae
+
 
 # 3. 克隆 luci-app-daed 仓库并复制 daed 和 luci-app-daed
-git clone --depth=1 --single-branch --branch kix https://github.com/QiuSimons/luci-app-daed.git
-cp -rf luci-app-daed/daed ./
-cp -rf luci-app-daed/luci-app-daed ./
-rm -rf luci-app-daed
+git clone https://github.com/QiuSimons/luci-app-daed package/dae
 
 echo "第三方 dae/daed 包替换完成。"
 
