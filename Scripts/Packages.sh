@@ -78,8 +78,6 @@ UPDATE_PACKAGE "viking" "VIKINGYFY/packages" "main" "" "luci-app-wolplus"
 #UPDATE_PACKAGE "vnt" "lmq8267/luci-app-vnt" "main"
 UPDATE_PACKAGE "lucky" "gdy666/luci-app-lucky" "main"
 #UPDATE_PACKAGE "luci-app-daede" "kenzok8/luci-app-daede" "main" "" "luci-app-daede"
-UPDATE_PACKAGE "dae" "QiuSimons/luci-app-dae" "kix" 
-UPDATE_PACKAGE "daed" "QiuSimons/luci-app-daed" "kix"
 UPDATE_PACKAGE "vmlinux-btf" "QiuSimons/vmlinux-btf" "master"
 
 
@@ -128,6 +126,29 @@ UPDATE_VERSION() {
 #UPDATE_VERSION "sing-box"
 #UPDATE_VERSION "dae"
 #UPDATE_VERSION "daed"
+
+#==================== 替换 dae/daed 为第三方版本 ====================
+echo "替换 dae/daed 为 QiuSimons 的 Kix 分支..."
+
+# 1. 精确删除官方 feeds 中的四个目标目录（不会误删其他包）
+rm -rf ../feeds/luci/applications/luci-app-dae
+rm -rf ../feeds/luci/applications/luci-app-daed
+rm -rf ../feeds/packages/net/dae
+rm -rf ../feeds/packages/net/daed
+
+# 2. 克隆 luci-app-dae 仓库并复制 dae 和 luci-app-dae
+git clone --depth=1 --single-branch --branch kix https://github.com/QiuSimons/luci-app-dae.git
+cp -rf luci-app-dae/dae ./
+cp -rf luci-app-dae/luci-app-dae ./
+rm -rf luci-app-dae
+
+# 3. 克隆 luci-app-daed 仓库并复制 daed 和 luci-app-daed
+git clone --depth=1 --single-branch --branch kix https://github.com/QiuSimons/luci-app-daed.git
+cp -rf luci-app-daed/daed ./
+cp -rf luci-app-daed/luci-app-daed ./
+rm -rf luci-app-daed
+
+echo "第三方 dae/daed 包替换完成。"
 
 #引入私有扩展脚本
 if [ -f "$GITHUB_WORKSPACE/Scripts/PRIVATE.sh" ]; then
