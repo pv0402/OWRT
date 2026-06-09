@@ -25,7 +25,7 @@ CONFIG_PACKAGE_dae=y
 CONFIG_PACKAGE_daed=y
 #CONFIG_PACKAGE_daed-geoip=y
 #CONFIG_PACKAGE_daed-geosite=y
-#CONFIG_PACKAGE_luci-app-daede=y
+CONFIG_PACKAGE_luci-app-daede=y
 CONFIG_PACKAGE_luci-app-dae=y
 CONFIG_PACKAGE_luci-app-daed=y
 #eBPF参数

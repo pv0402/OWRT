@@ -77,8 +77,7 @@ UPDATE_PACKAGE "aurora-config" "eamonxg/luci-app-aurora-config" "master"
 UPDATE_PACKAGE "viking" "VIKINGYFY/packages" "main" "" "luci-app-wolplus"
 #UPDATE_PACKAGE "vnt" "lmq8267/luci-app-vnt" "main"
 UPDATE_PACKAGE "lucky" "gdy666/luci-app-lucky" "main"
-#UPDATE_PACKAGE "luci-app-daede" "kenzok8/luci-app-daede" "main" "" "luci-app-daede"
-UPDATE_PACKAGE "vmlinux-btf" "QiuSimons/vmlinux-btf" "master"
+UPDATE_PACKAGE "luci-app-daede" "kenzok8/openwrt-daede" "main" "" "luci-app-daede"
 
 
 #更新软件包版本
