@@ -2,6 +2,12 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2026 VIKINGYFY
 
+#删除原版dae/daed
+rm -rf ../feeds/luci/applications/luci-app-dae
+rm -rf ../feeds/luci/applications/luci-app-daed
+rm -rf ../feeds/packages/net/dae
+rm -rf ../feeds/packages/net/daed
+
 #安装和更新软件包
 UPDATE_PACKAGE() {
 	local PKG_NAME=$1
@@ -77,9 +83,7 @@ UPDATE_PACKAGE "aurora-config" "eamonxg/luci-app-aurora-config" "master"
 UPDATE_PACKAGE "viking" "VIKINGYFY/packages" "main" "" "luci-app-wolplus"
 #UPDATE_PACKAGE "vnt" "lmq8267/luci-app-vnt" "main"
 UPDATE_PACKAGE "lucky" "gdy666/luci-app-lucky" "main"
-#UPDATE_PACKAGE "luci-app-daede" "kenzok8/luci-app-daede" "main" "" "luci-app-daede"
-UPDATE_PACKAGE "vmlinux-btf" "QiuSimons/vmlinux-btf" "master"
-
+UPDATE_PACKAGE "openwrt-daede" "kenzok8/openwrt-daede" "main"
 
 #更新软件包版本
 UPDATE_VERSION() {
@@ -126,23 +130,6 @@ UPDATE_VERSION() {
 #UPDATE_VERSION "sing-box"
 #UPDATE_VERSION "dae"
 #UPDATE_VERSION "daed"
-
-#==================== 替换 dae/daed 为第三方版本 ====================
-echo "替换 dae/daed 为 QiuSimons 的 Kix 分支..."
-
-# 1. 精确删除官方 feeds 中的四个目标目录（不会误删其他包）
-rm -rf ../feeds/luci/applications/luci-app-dae
-rm -rf ../feeds/luci/applications/luci-app-daed
-rm -rf ../feeds/packages/net/dae
-rm -rf ../feeds/packages/net/daed
-
-# 2. 克隆 luci-app-dae 仓库并复制 dae 和 luci-app-dae
-git clone https://github.com/QiuSimons/luci-app-dae package/dae
-
-# 3. 克隆 luci-app-daed 仓库并复制 daed 和 luci-app-daed
-git clone https://github.com/QiuSimons/luci-app-daed package/daed
-
-echo "第三方 dae/daed 包替换完成。"
 
 #引入私有扩展脚本
 if [ -f "$GITHUB_WORKSPACE/Scripts/PRIVATE.sh" ]; then
