@@ -85,6 +85,7 @@ UPDATE_PACKAGE "viking" "VIKINGYFY/packages" "main" "" "luci-app-wolplus"
 UPDATE_PACKAGE "lucky" "gdy666/luci-app-lucky" "main"
 UPDATE_PACKAGE "openwrt-daede" "kenzok8/openwrt-daede" "main"
 
+
 #更新软件包版本
 UPDATE_VERSION() {
 	local PKG_NAME=$1
