@@ -77,7 +77,7 @@ UPDATE_PACKAGE "aurora-config" "eamonxg/luci-app-aurora-config" "master"
 UPDATE_PACKAGE "viking" "VIKINGYFY/packages" "main" "" "luci-app-wolplus"
 #UPDATE_PACKAGE "vnt" "lmq8267/luci-app-vnt" "main"
 UPDATE_PACKAGE "lucky" "gdy666/luci-app-lucky" "main"
-UPDATE_PACKAGE "luci-app-daede" "kenzok8/openwrt-daede" "main" "" "luci-app-daede"
+#UPDATE_PACKAGE "luci-app-daede" "kenzok8/openwrt-daede" "main" "" "luci-app-daede"
 
 
 #更新软件包版本
@@ -142,6 +142,11 @@ git clone https://github.com/QiuSimons/luci-app-dae package/dae
 git clone https://github.com/QiuSimons/luci-app-daed package/daed
 
 echo "第三方 dae/daed 包替换完成。"
+
+echo ">> 集成 luci-app-daede..."
+git clone --depth=1 --single-branch --branch main https://github.com/kenzok8/openwrt-daede.git tmp-daede
+cp -rf tmp-daede/luci-app-daede package/
+rm -rf tmp-daede
 
 #引入私有扩展脚本
 if [ -f "$GITHUB_WORKSPACE/Scripts/PRIVATE.sh" ]; then
