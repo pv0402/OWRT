@@ -68,10 +68,6 @@ function generate_config() {
 
 generate_config
 
-#移除onionshare-cli
-echo "::group::Removing problematic packages"
-find . -ipath "*/onionshare-cli" -prune -exec rm -rf {} \; -print
-echo "::endgroup::"
 
 #移除luci-app-attendedsysupgrade
 sed -i "/attendedsysupgrade/d" $(find ./feeds/luci/collections/ -type f -name "Makefile")
