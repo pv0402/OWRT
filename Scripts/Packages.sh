@@ -143,10 +143,23 @@ git clone https://github.com/QiuSimons/luci-app-daed package/daed
 
 echo "第三方 dae/daed 包替换完成。"
 
+echo "移除vmlinux-btf依赖"
+# 移除 daed 对 vmlinux-btf 的依赖
+sed -i '/+DAED_USE_VMLINUX_BTF:vmlinux-btf/d' package/package/daed/daed/Makefile
+# 移除 dae 对 vmlinux-btf 的依赖
+sed -i '/+DAE_USE_VMLINUX_BTF:vmlinux-btf/d' package/package/dae/dae/Makefile
+
 echo ">> 集成 luci-app-daede..."
 git clone --depth=1 --single-branch --branch main https://github.com/kenzok8/openwrt-daede.git tmp-daede
 cp -rf tmp-daede/luci-app-daede package/
 rm -rf tmp-daede
+
+#移除onionshare-cli lxc
+echo "::group::Removing problematic packages"
+find . -ipath "*/onionshare-cli" -prune -exec rm -rf {} \; -print
+find . -ipath "*/lxc" -prune -exec rm -rf {} \; -print
+echo "::endgroup::"
+
 
 #引入私有扩展脚本
 if [ -f "$GITHUB_WORKSPACE/Scripts/PRIVATE.sh" ]; then

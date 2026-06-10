@@ -9,7 +9,7 @@ https://github.com/VIKINGYFY/immortalwrt.git
 nss-packages：
 https://github.com/VIKINGYFY/nss-packages
 
-eBPF集成：
+eBPF集成:
 https://github.com/kwrum1/daed-ImmortalWRT-CI
 
 
