@@ -26,15 +26,15 @@ rm -rf tmp-daede
 
 # 移除 OpenWrt Feeds 自带的核心库
 rm -rf ../feeds/packages/net/{xray-core,v2ray-geodata,sing-box,chinadns-ng,dns2socks,hysteria,ipt2socks,microsocks,naiveproxy,shadowsocks-libev,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,trojan-plus,tuic-client,v2ray-plugin,xray-plugin,geoview,shadow-tls}
-git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages ./passwall-packages
+git clone https://github.com/Openwrt-Passwall/openwrt-passwall-packages ./passwall-packages
 
 # 移除 OpenWrt Feeds 过时的LuCI版本
 rm -rf ../feeds/luci/applications/luci-app-passwall
-git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall ./luci-app-passwall
+git clone https://github.com/Openwrt-Passwall/openwrt-passwall ./passwall-luci
 
 
 # 清理 PassWall 的 chnlist 规则文件
-echo "baidu.com"  > ./luci-app-passwall/luci-app-passwall/root/usr/share/passwall/rules/chnlist
+echo "baidu.com"  > ./passwall-luci/luci-app-passwall/root/usr/share/passwall/rules/chnlist
 
 echo "==================== 当前工作目录 ===================="
 pwd
