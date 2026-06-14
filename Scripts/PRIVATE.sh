@@ -17,12 +17,24 @@ rm -rf ../feeds/packages/net/daed
 #echo "第三方 dae/daed 包替换完成。"
 
 #echo ">> 集成 luci-app-daede..."
-# 拉取 kenzok8 的 daede 仓库到源码根目录（与 package 同级）
+
+# 拉取 kenzok8 的 daede 仓库
 echo "拉取 openwrt-daede 仓库..."
-rm -rf ../openwrt-daede
 git clone --depth 1 https://github.com/kenzok8/openwrt-daede.git ./openwrt-daede
 echo "openwrt-daede 已放置到package目录。"
-find ./openwrt-daede -maxdepth 2 -type f -o -type d | sort
+
+# 替换 update-geo.sh 中的下载源为 Loyalsoldier 版本
+UPDATE_GEO_SH="./openwrt-daede/luci-app-daede/root/usr/share/luci-app-daede/update-geo.sh"
+if [ -f "$UPDATE_GEO_SH" ]; then
+    sed -i 's|https://github.com/v2fly/geoip/releases/latest/download/geoip.dat|https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat|g' "$UPDATE_GEO_SH"
+    sed -i 's|https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat|https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat|g' "$UPDATE_GEO_SH"
+    echo "update-geo.sh 下载源已替换为 Loyalsoldier。"
+else
+    echo "警告：未找到 update-geo.sh 文件，跳过修改。"
+fi
+
+#find ./openwrt-daede -maxdepth 2 -type f -o -type d | sort
+
 #git clone --depth=1 --single-branch --branch main \
 #  https://github.com/kenzok8/openwrt-daede.git tmp-daede
 #cp -rf tmp-daede/luci-app-daede ./
@@ -116,4 +128,4 @@ find . -maxdepth 1 -type d ! -path . | sort
 echo ""
 
 echo "=========================================================="
-find . -maxdepth 3 -type f -o -type d | sort
+#find . -maxdepth 3 -type f -o -type d | sort
