@@ -1,6 +1,6 @@
 #PRIVATE.sh
 #==================== 替换 dae/daed 为第三方版本 ====================
-echo "替换 dae/daed 为 QiuSimons 的 Kix 分支..."
+#echo "替换 dae/daed 为 QiuSimons 的 Kix 分支..."
 
 # 1. 删除官方 feeds 中的四个目标目录
 rm -rf ../feeds/luci/applications/luci-app-dae
@@ -9,23 +9,24 @@ rm -rf ../feeds/packages/net/dae
 rm -rf ../feeds/packages/net/daed
 
 # 2. 克隆 dae 仓库
-git clone https://github.com/QiuSimons/luci-app-dae ./dae
+#git clone https://github.com/QiuSimons/luci-app-dae ./dae
 
 # 3. 克隆 daed 仓库
-git clone https://github.com/QiuSimons/luci-app-daed ./daed
+#git clone https://github.com/QiuSimons/luci-app-daed ./daed
 
-echo "第三方 dae/daed 包替换完成。"
+#echo "第三方 dae/daed 包替换完成。"
 
 echo ">> 集成 luci-app-daede..."
-git clone --depth=1 --single-branch --branch main \
-  https://github.com/kenzok8/openwrt-daede.git tmp-daede
-cp -rf tmp-daede/luci-app-daede ./
-rm -rf tmp-daede
+git clone https://github.com/kenzok8/openwrt-daede ./
+#git clone --depth=1 --single-branch --branch main \
+#  https://github.com/kenzok8/openwrt-daede.git tmp-daede
+#cp -rf tmp-daede/luci-app-daede ./
+#rm -rf tmp-daede
 
 #==================== 集成 lucky ====================
 echo "处理 lucky..."
 
-# 删除 feeds 中的旧包
+# 删除 feeds 旧包
 rm -rf ../feeds/luci/applications/luci-app-lucky 2>/dev/null
 rm -rf ../feeds/packages/net/lucky 2>/dev/null
 
@@ -42,7 +43,7 @@ if [ -d "./luci-app-lucky-tmp/luci-app-lucky" ]; then
 fi
 rm -rf ./luci-app-lucky-tmp
 
-# 修改默认配置
+# 修改默认配置（与版本无关，始终执行）
 lucky_conf="./lucky/files/luckyuci"
 if [ -f "$lucky_conf" ]; then
     sed -i "s/option enabled '1'/option enabled '0'/g" "$lucky_conf"
@@ -50,26 +51,41 @@ if [ -f "$lucky_conf" ]; then
     echo "lucky 默认配置已修改。"
 fi
 
-# 可选：离线补丁替换
+# 自动检测 patches/ 目录下的补丁包，提取版本号并更新 Makefile
 patches_dir="$GITHUB_WORKSPACE/patches"
 lucky_makefile="./lucky/Makefile"
+
 if [ -d "$patches_dir" ] && [ -f "$lucky_makefile" ]; then
+    # 找到版本号最大的补丁包
     latest_patch=$(ls "$patches_dir" 2>/dev/null | grep -E '^lucky_.*_Linux_.*_wanji\.tar\.gz$' | sort -V | tail -1)
+    
     if [ -n "$latest_patch" ]; then
         version=$(echo "$latest_patch" | sed -n 's/^lucky_\(.*\)_Linux_.*$/\1/p')
         if [ -n "$version" ]; then
-            echo "发现 lucky 离线补丁: $latest_patch，版本 $version，将替换下载。"
+            echo "发现 lucky 离线补丁: $latest_patch，将版本更新为 $version"
+
+            # 1. 更新 Makefile 中的 PKG_VERSION
+            if grep -q "^PKG_VERSION:=" "$lucky_makefile"; then
+                sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$version/" "$lucky_makefile"
+                echo "lucky 版本号已自动更新为 $version"
+            fi
+
+            # 2. 插入本地补丁安装命令，删除 wget 下载
             patch_line="\\t[ -f \$(TOPDIR)/../patches/lucky_${version}_Linux_\$(LUCKY_ARCH)_wanji.tar.gz ] && install -Dm644 \$(TOPDIR)/../patches/lucky_${version}_Linux_\$(LUCKY_ARCH)_wanji.tar.gz \$(PKG_BUILD_DIR)/\$(PKG_NAME)_\$(PKG_VERSION)_Linux_\$(LUCKY_ARCH).tar.gz"
             if grep -q "Build/Prepare" "$lucky_makefile"; then
                 sed -i "/Build\\/Prepare/a\\$patch_line" "$lucky_makefile"
                 sed -i '/wget/d' "$lucky_makefile"
-                echo "lucky Makefile 已插入本地补丁命令。"
+                echo "已插入本地补丁安装命令。"
             fi
         fi
+    else
+        echo "未找到任何 lucky 离线补丁，版本号保持不变。"
     fi
+else
+    echo "patches 目录或 lucky Makefile 不存在，跳过离线补丁处理。"
 fi
 
-echo "lucky 集成完成（保留原始版本，运行时由程序内部判断更新）。"
+echo "lucky 集成完成。"
 
 ###编译最新PassWall###
 
