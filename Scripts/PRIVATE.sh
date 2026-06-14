@@ -43,10 +43,6 @@ fi
 #==================== 集成 lucky ====================
 echo "处理 lucky..."
 
-# 删除 feeds 旧包
-rm -rf ../feeds/luci/applications/luci-app-lucky 2>/dev/null
-rm -rf ../feeds/packages/net/lucky 2>/dev/null
-
 # 克隆仓库
 git clone --depth 1 --single-branch --branch main \
   https://github.com/gdy666/luci-app-lucky.git ./luci-app-lucky-tmp
@@ -66,40 +62,6 @@ if [ -f "$lucky_conf" ]; then
     sed -i "s/option enabled '1'/option enabled '0'/g" "$lucky_conf"
     sed -i "s/option logger '1'/option logger '0'/g" "$lucky_conf"
     echo "lucky 默认配置已修改。"
-fi
-
-# 自动检测 patches/ 目录下的补丁包，提取版本号并更新 Makefile
-patches_dir="$GITHUB_WORKSPACE/patches"
-lucky_makefile="./lucky/Makefile"
-
-if [ -d "$patches_dir" ] && [ -f "$lucky_makefile" ]; then
-    # 找到版本号最大的补丁包
-    latest_patch=$(ls "$patches_dir" 2>/dev/null | grep -E '^lucky_.*_Linux_.*_wanji\.tar\.gz$' | sort -V | tail -1)
-    
-    if [ -n "$latest_patch" ]; then
-        version=$(echo "$latest_patch" | sed -n 's/^lucky_\(.*\)_Linux_.*$/\1/p')
-        if [ -n "$version" ]; then
-            echo "发现 lucky 离线补丁: $latest_patch，将版本更新为 $version"
-
-            # 1. 更新 Makefile 中的 PKG_VERSION
-            if grep -q "^PKG_VERSION:=" "$lucky_makefile"; then
-                sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$version/" "$lucky_makefile"
-                echo "lucky 版本号已自动更新为 $version"
-            fi
-
-            # 2. 插入本地补丁安装命令，删除 wget 下载
-            patch_line="\\t[ -f \$(TOPDIR)/../patches/lucky_${version}_Linux_\$(LUCKY_ARCH)_wanji.tar.gz ] && install -Dm644 \$(TOPDIR)/../patches/lucky_${version}_Linux_\$(LUCKY_ARCH)_wanji.tar.gz \$(PKG_BUILD_DIR)/\$(PKG_NAME)_\$(PKG_VERSION)_Linux_\$(LUCKY_ARCH).tar.gz"
-            if grep -q "Build/Prepare" "$lucky_makefile"; then
-                sed -i "/Build\\/Prepare/a\\$patch_line" "$lucky_makefile"
-                sed -i '/wget/d' "$lucky_makefile"
-                echo "已插入本地补丁安装命令。"
-            fi
-        fi
-    else
-        echo "未找到任何 lucky 离线补丁，版本号保持不变。"
-    fi
-else
-    echo "patches 目录或 lucky Makefile 不存在，跳过离线补丁处理。"
 fi
 
 echo "lucky 集成完成。"
