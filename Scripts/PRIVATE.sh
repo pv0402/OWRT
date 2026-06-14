@@ -116,3 +116,4 @@ find . -maxdepth 1 -type d ! -path . | sort
 echo ""
 
 echo "=========================================================="
+find . -maxdepth 3 -type f -o -type d | sort
