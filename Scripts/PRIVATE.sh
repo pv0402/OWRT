@@ -20,8 +20,9 @@ rm -rf ../feeds/packages/net/daed
 # 拉取 kenzok8 的 daede 仓库到源码根目录（与 package 同级）
 echo "拉取 openwrt-daede 仓库..."
 rm -rf ../openwrt-daede
-git clone --depth 1 https://github.com/kenzok8/openwrt-daede.git ../openwrt-daede
-echo "openwrt-daede 已放置到 wrt 根目录。"
+git clone --depth 1 https://github.com/kenzok8/openwrt-daede.git ./openwrt-daede
+echo "openwrt-daede 已放置到package目录。"
+find ./openwrt-daede -maxdepth 2 -type f -o -type d | sort
 #git clone --depth=1 --single-branch --branch main \
 #  https://github.com/kenzok8/openwrt-daede.git tmp-daede
 #cp -rf tmp-daede/luci-app-daede ./
