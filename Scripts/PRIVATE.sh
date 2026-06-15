@@ -64,6 +64,51 @@ if [ -f "$lucky_conf" ]; then
     echo "lucky 默认配置已修改。"
 fi
 
+# 5. 离线补丁处理（复制到 dl 目录，并修改 Makefile）
+patches_dir="$GITHUB_WORKSPACE/patches"
+lucky_makefile="./lucky/Makefile"
+
+if [ -f "$lucky_makefile" ]; then
+    if [ -d "$patches_dir" ]; then
+        latest_patch=$(ls "$patches_dir" 2>/dev/null | grep -E '^lucky_.*_Linux_.*_wanji\.tar\.gz$' | sort -V | tail -1)
+        if [ -n "$latest_patch" ]; then
+            patch_version=$(echo "$latest_patch" | sed -n 's/^lucky_\(.*\)_Linux_.*$/\1/p')
+            if [ -n "$patch_version" ]; then
+                echo "发现离线补丁: $latest_patch，版本 $patch_version，将替换下载。"
+
+                # 复制补丁到 OpenWrt 的 dl 目录（当前目录是 package/，../dl 就是 wrt/dl）
+                dl_dir="../dl"
+                mkdir -p "$dl_dir"
+                if cp "$patches_dir/$latest_patch" "$dl_dir/"; then
+                    echo "补丁文件已复制到 $dl_dir/"
+                else
+                    echo "错误：无法复制补丁文件到 $dl_dir/" >&2
+                    return 1 2>/dev/null || exit 1
+                fi
+
+                if ! grep -q "Build/Prepare" "$lucky_makefile"; then
+                    echo "警告：lucky Makefile 中未找到 'Build/Prepare'，无法插入补丁命令。" >&2
+                else
+                    TAB=$'\t'
+                    # 插入的命令：从 $(DL_DIR) 获取补丁文件
+                    patch_line="${TAB}[ -f \$(DL_DIR)/lucky_${patch_version}_Linux_\$(LUCKY_ARCH)_wanji.tar.gz ] && install -Dm644 \$(DL_DIR)/lucky_${patch_version}_Linux_\$(LUCKY_ARCH)_wanji.tar.gz \$(PKG_BUILD_DIR)/\$(PKG_NAME)_\$(PKG_VERSION)_Linux_\$(LUCKY_ARCH).tar.gz"
+                    sed -i "/Build\\/Prepare/a\\$patch_line" "$lucky_makefile"
+                    sed -i '/wget/d' "$lucky_makefile"
+                    echo "已插入本地补丁安装命令，并移除 wget 下载。"
+                fi
+            else
+                echo "警告：无法从 $latest_patch 中提取版本号，跳过补丁处理。" >&2
+            fi
+        else
+            echo "未找到任何 lucky 离线补丁，保留 wget 下载。"
+        fi
+    else
+        echo "patches 目录不存在，跳过补丁处理。"
+    fi
+else
+    echo "警告：lucky Makefile 未找到，无法进行补丁操作。" >&2
+fi
+
 echo "lucky 集成完成。"
 
 ###编译最新PassWall###
