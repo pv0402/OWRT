@@ -56,12 +56,54 @@ if [ -d "./luci-app-lucky-tmp/luci-app-lucky" ]; then
 fi
 rm -rf ./luci-app-lucky-tmp
 
-# 修改默认配置（与版本无关，始终执行）
+# 修改默认配置
 lucky_conf="./lucky/files/luckyuci"
 if [ -f "$lucky_conf" ]; then
     sed -i "s/option enabled '1'/option enabled '0'/g" "$lucky_conf"
     sed -i "s/option logger '1'/option logger '0'/g" "$lucky_conf"
     echo "lucky 默认配置已修改。"
+else
+    echo "警告：未找到 luckyuci 配置文件，跳过默认配置修改。" >&2
+fi
+
+# 离线补丁处理（不修改版本号）
+patches_dir="$GITHUB_WORKSPACE/patches"
+lucky_makefile="./lucky/Makefile"
+
+if [ -f "$lucky_makefile" ]; then
+    if [ -d "$patches_dir" ]; then
+        # 找到最新补丁
+        latest_patch=$(ls "$patches_dir" 2>/dev/null | grep -E '^lucky_.*_Linux_.*_wanji\.tar\.gz$' | sort -V | tail -1)
+        if [ -n "$latest_patch" ]; then
+            # 提取补丁包自带的版本号（只用于构造路径）
+            patch_version=$(echo "$latest_patch" | sed -n 's/^lucky_\(.*\)_Linux_.*$/\1/p')
+            if [ -n "$patch_version" ]; then
+                echo "发现离线补丁: $latest_patch (内含版本 $patch_version)"
+                
+                if ! grep -q "Build/Prepare" "$lucky_makefile"; then
+                    echo "警告：lucky Makefile 中未找到 'Build/Prepare'，无法插入补丁命令。" >&2
+                else
+                    # 真正的 Tab 字符
+                    TAB=$'\t'
+                    # 注意：路径使用 ../patches/... 对应你仓库根目录的 patches/
+                    patch_line="${TAB}[ -f \$(TOPDIR)/../patches/lucky_${patch_version}_Linux_\$(LUCKY_ARCH)_wanji.tar.gz ] && install -Dm644 \$(TOPDIR)/../patches/lucky_${patch_version}_Linux_\$(LUCKY_ARCH)_wanji.tar.gz \$(PKG_BUILD_DIR)/\$(PKG_NAME)_\$(PKG_VERSION)_Linux_\$(LUCKY_ARCH).tar.gz"
+                    
+                    sed -i "/Build\\/Prepare/a\\$patch_line" "$lucky_makefile"
+                    # 删除原有的 wget 下载命令
+                    sed -i '/wget/d' "$lucky_makefile"
+                    echo "已插入本地补丁安装命令，并移除 wget 下载（版本号保持原样）。"
+                fi
+            else
+                echo "警告：无法从 $latest_patch 中提取版本号，跳过补丁处理。" >&2
+            fi
+        else
+            echo "未找到任何 lucky 离线补丁，保留 wget 下载。"
+        fi
+    else
+        echo "patches 目录不存在，跳过补丁处理。"
+    fi
+else
+    echo "警告：lucky Makefile 未找到，无法进行补丁操作。" >&2
 fi
 
 echo "lucky 集成完成。"
